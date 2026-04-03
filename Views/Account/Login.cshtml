@@ -1,0 +1,96 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "_Layout";
+}
+
+<div style="min-height:80vh; display:flex; align-items:center; background:var(--brand-cream); padding:3rem 0;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+
+                <div class="text-center mb-4">
+                    <a href="/" class="text-decoration-none">
+                        <div style="font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color:var(--brand-dark);">Lumière</div>
+                    </a>
+                    <h2 class="mt-3" style="font-family:'Playfair Display',serif; font-size:1.6rem;">Welcome back</h2>
+                    <p class="text-muted" style="font-size:0.9rem;">Sign in to your account to continue</p>
+                </div>
+
+                <div class="form-card">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger rounded-3 mb-4">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="you@example.com" autocomplete="email" />
+                            <span asp-validation-for="Email" class="text-danger" style="font-size:0.82rem;"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <div class="position-relative">
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Enter password"
+                                       id="passwordField" autocomplete="current-password" />
+                                <button type="button" class="btn position-absolute end-0 top-0 h-100 px-3"
+                                        style="background:none; border:none; color:var(--brand-muted);"
+                                        onclick="togglePassword()">
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger" style="font-size:0.82rem;"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-brand w-100 btn-lg mb-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                        </button>
+
+                        <div class="text-center">
+                            <span style="font-size:0.88rem; color:var(--brand-muted);">Don't have an account?</span>
+                            <a href="/Account/Register" class="ms-1 text-decoration-none fw-semibold" style="color:var(--brand-gold);">Create one</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Demo Credentials Box -->
+                <div class="mt-3 p-3 rounded-3 text-center" style="background:white; border:1.5px dashed var(--brand-border);">
+                    <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--brand-muted); margin-bottom:0.5rem;">
+                        Demo Credentials
+                    </div>
+                    <div style="font-size:0.88rem;">
+                        <strong>Admin:</strong> admin@ecommerce.com / Admin@123
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function togglePassword() {
+    const field = document.getElementById('passwordField');
+    const icon = document.getElementById('eyeIcon');
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        field.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
+}

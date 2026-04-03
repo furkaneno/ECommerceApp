@@ -1,0 +1,164 @@
+@model Product
+@{
+    ViewData["Title"] = Model.Name;
+    var related = ViewBag.Related as IEnumerable<Product> ?? new List<Product>();
+}
+
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb" style="font-size:0.85rem">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none" style="color:var(--brand-gold)">Home</a></li>
+            <li class="breadcrumb-item"><a href="/Product" class="text-decoration-none" style="color:var(--brand-gold)">Shop</a></li>
+            <li class="breadcrumb-item"><a href="/Product?categoryId=@Model.CategoryId" class="text-decoration-none" style="color:var(--brand-gold)">@Model.Category.Name</a></li>
+            <li class="breadcrumb-item active text-muted">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5 align-items-start">
+        <!-- Product Image -->
+        <div class="col-lg-5">
+            <div class="rounded-3 overflow-hidden" style="border:1px solid var(--brand-border); aspect-ratio:4/3; background:var(--brand-light)">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Name"
+                         class="w-100 h-100" style="object-fit:cover;" />
+                }
+                else
+                {
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <i class="bi bi-image text-muted" style="font-size:5rem;"></i>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-7">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <a href="/Product?categoryId=@Model.CategoryId" class="text-decoration-none">
+                    <span class="badge" style="background:var(--brand-light); color:var(--brand-muted); font-weight:600; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.4rem 0.8rem; border-radius:20px; border:1.5px solid var(--brand-border)">
+                        @Model.Category.Name
+                    </span>
+                </a>
+                @if (Model.Stock <= 5 && Model.Stock > 0)
+                {
+                    <span class="badge" style="background:#fff3cd; color:#856404; font-size:0.75rem; padding:0.4rem 0.8rem; border-radius:20px;">
+                        <i class="bi bi-exclamation-triangle me-1"></i>Only @Model.Stock left!
+                    </span>
+                }
+            </div>
+
+            <h1 style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:600; line-height:1.2; margin-bottom:0.8rem;">
+                @Model.Name
+            </h1>
+
+            <div class="d-flex align-items-baseline gap-3 mb-4">
+                <span style="font-size:2.2rem; font-weight:700; color:var(--brand-dark);">$@Model.Price.ToString("N2")</span>
+                @if (Model.Stock > 0)
+                {
+                    <span style="color:#2e7d32; font-size:0.88rem; font-weight:600;">
+                        <i class="bi bi-check-circle me-1"></i>In Stock (@Model.Stock available)
+                    </span>
+                }
+                else
+                {
+                    <span style="color:#c62828; font-size:0.88rem; font-weight:600;">
+                        <i class="bi bi-x-circle me-1"></i>Out of Stock
+                    </span>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="mb-4">
+                    <h6 style="font-weight:700; font-size:0.82rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--brand-muted); margin-bottom:0.6rem;">Description</h6>
+                    <p style="line-height:1.75; color:#444; font-size:0.95rem;">@Model.Description</p>
+                </div>
+            }
+
+            <!-- Add to Cart Form -->
+            @if (Model.Stock > 0)
+            {
+                <form action="/Cart/AddToCart" method="post" class="d-flex gap-3 align-items-center flex-wrap">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="qty" class="form-label mb-0 fw-semibold" style="font-size:0.88rem;">Qty:</label>
+                        <input type="number" id="qty" name="quantity" value="1" min="1" max="@Model.Stock"
+                               class="form-control text-center"
+                               style="width:80px; font-weight:600;" />
+                    </div>
+                    <button type="submit" class="btn btn-gold btn-lg px-4 flex-grow-1 flex-md-grow-0">
+                        <i class="bi bi-bag-plus me-2"></i>Add to Cart
+                    </button>
+                    <a href="/Cart" class="btn btn-primary-brand btn-lg px-4">
+                        <i class="bi bi-bag me-2"></i>View Cart
+                    </a>
+                </form>
+            }
+            else
+            {
+                <div class="alert" style="background:var(--brand-light); border:1.5px solid var(--brand-border); border-radius:10px; color:var(--brand-muted);">
+                    <i class="bi bi-clock me-2"></i>This product is currently out of stock. Check back soon!
+                </div>
+            }
+
+            <!-- Meta Info -->
+            <div class="mt-4 pt-4 border-top" style="border-color:var(--brand-border) !important">
+                <div class="row g-3">
+                    <div class="col-auto">
+                        <div style="font-size:0.78rem; color:var(--brand-muted); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-bottom:2px;">Category</div>
+                        <div style="font-size:0.9rem; font-weight:500;">@Model.Category.Name</div>
+                    </div>
+                    <div class="col-auto">
+                        <div style="font-size:0.78rem; color:var(--brand-muted); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-bottom:2px;">SKU</div>
+                        <div style="font-size:0.9rem; font-weight:500;">LMR-@Model.Id.ToString("D4")</div>
+                    </div>
+                    <div class="col-auto">
+                        <div style="font-size:0.78rem; color:var(--brand-muted); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-bottom:2px;">Added</div>
+                        <div style="font-size:0.9rem; font-weight:500;">@Model.CreatedAt.ToString("MMM dd, yyyy")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    @if (related.Any())
+    {
+        <div class="mt-6 pt-5" style="margin-top:4rem">
+            <span class="section-eyebrow">More From This Category</span>
+            <h2 class="section-title">Related Products</h2>
+            <hr class="divider-gold" />
+
+            <div class="row g-4">
+                @foreach (var p in related)
+                {
+                    <div class="col-6 col-md-3">
+                        <a href="/Product/Details/@p.Id" class="text-decoration-none">
+                            <div class="product-card">
+                                <div class="product-card-img-wrap">
+                                    @if (!string.IsNullOrEmpty(p.ImageUrl))
+                                    {
+                                        <img src="@p.ImageUrl" alt="@p.Name" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                                            <i class="bi bi-image text-muted fs-3"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="product-card-body">
+                                    <div class="product-title">@p.Name</div>
+                                    <div class="product-price mt-1">$@p.Price.ToString("N2")</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

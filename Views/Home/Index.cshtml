@@ -1,0 +1,183 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+    Layout = "_Layout";
+}
+
+<!-- HERO -->
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-eyebrow">New Season Collection</div>
+                <h1 class="hero-title">
+                    Shop With<br />
+                    <span style="color:var(--brand-gold)">Refined Taste</span>
+                </h1>
+                <p class="hero-sub">
+                    Discover curated products from global brands — electronics, fashion,
+                    books, and more delivered to your door.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/Product" class="btn btn-gold btn-lg px-4">
+                        <i class="bi bi-grid me-2"></i>Browse All Products
+                    </a>
+                    @if (Context.Session.GetInt32("UserId") == null)
+                    {
+                        <a href="/Account/Register" class="btn btn-outline-light btn-lg px-4">Create Account</a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center mt-4 mt-lg-0">
+                <div class="d-flex flex-wrap gap-3 justify-content-center" style="max-width:380px; margin:auto">
+                    <div style="background:rgba(255,255,255,0.06); border-radius:16px; padding:1.5rem 2rem; border:1px solid rgba(255,255,255,0.1); text-align:center;">
+                        <div style="font-size:2rem; font-weight:700; color:var(--brand-gold); font-family:'Playfair Display',serif">12+</div>
+                        <div style="font-size:0.78rem; color:rgba(255,255,255,0.5); letter-spacing:0.1em; text-transform:uppercase">Products</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.06); border-radius:16px; padding:1.5rem 2rem; border:1px solid rgba(255,255,255,0.1); text-align:center;">
+                        <div style="font-size:2rem; font-weight:700; color:var(--brand-gold); font-family:'Playfair Display',serif">5</div>
+                        <div style="font-size:0.78rem; color:rgba(255,255,255,0.5); letter-spacing:0.1em; text-transform:uppercase">Categories</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.06); border-radius:16px; padding:1.5rem 2rem; border:1px solid rgba(255,255,255,0.1); text-align:center;">
+                        <div style="font-size:2rem; font-weight:700; color:var(--brand-gold); font-family:'Playfair Display',serif">Free</div>
+                        <div style="font-size:0.78rem; color:rgba(255,255,255,0.5); letter-spacing:0.1em; text-transform:uppercase">Shipping</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SEARCH RESULTS NOTICE -->
+@if (!string.IsNullOrEmpty(Model.SearchQuery))
+{
+    <div class="container mt-4">
+        <div class="alert" style="background:var(--brand-light); border:1px solid var(--brand-border); border-radius:10px; color:var(--brand-dark)">
+            <i class="bi bi-search me-2"></i>
+            Search results for <strong>"@Model.SearchQuery"</strong>
+            — @Model.FeaturedProducts.Count() result(s) found.
+            <a href="/" class="ms-3 text-decoration-none" style="color:var(--brand-gold)">Clear <i class="bi bi-x"></i></a>
+        </div>
+    </div>
+}
+
+<!-- CATEGORIES BAR -->
+<section class="py-4" style="background:white; border-bottom:1px solid var(--brand-border);">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <span style="font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--brand-muted)">Browse:</span>
+            @foreach (var cat in Model.Categories)
+            {
+                <a href="/Product?categoryId=@cat.Id" class="text-decoration-none">
+                    <span class="badge" style="background:var(--brand-light); color:var(--brand-dark); font-weight:500; font-size:0.82rem; padding:0.5rem 1rem; border-radius:20px; border:1.5px solid var(--brand-border);">
+                        @cat.Name
+                    </span>
+                </a>
+            }
+            <a href="/Product" class="ms-auto text-decoration-none" style="font-size:0.85rem; color:var(--brand-gold); font-weight:600;">
+                View All <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex align-items-end justify-content-between mb-4">
+            <div>
+                <span class="section-eyebrow">@(string.IsNullOrEmpty(Model.SearchQuery) ? "Featured Collection" : "Search Results")</span>
+                <h2 class="section-title mb-0">@(string.IsNullOrEmpty(Model.SearchQuery) ? "Curated For You" : $"\"{Model.SearchQuery}\"")</h2>
+                <hr class="divider-gold" />
+            </div>
+            <a href="/Product" class="btn btn-outline-brand d-none d-md-flex align-items-center gap-2">
+                All Products <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        @if (!Model.FeaturedProducts.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-search" style="font-size:3rem; color:var(--brand-muted);"></i>
+                <h4 class="mt-3">No products found</h4>
+                <p class="text-muted">Try a different search term.</p>
+                <a href="/" class="btn btn-gold">Back to Home</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var product in Model.FeaturedProducts)
+                {
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="/Product/Details/@product.Id" class="text-decoration-none">
+                            <div class="product-card h-100">
+                                <div class="product-card-img-wrap">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.Name" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex align-items-center justify-content-center h-100">
+                                            <i class="bi bi-image" style="font-size:3rem; color:var(--brand-muted);"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="product-card-body">
+                                    <div class="product-category-tag">@product.Category.Name</div>
+                                    <div class="product-title">@product.Name</div>
+                                    <div class="d-flex align-items-center justify-content-between mt-2">
+                                        <span class="product-price">$@product.Price.ToString("N2")</span>
+                                        @if (product.Stock <= 5 && product.Stock > 0)
+                                        {
+                                            <span class="stock-badge badge" style="background:#fff3cd; color:#856404;">Only @product.Stock left</span>
+                                        }
+                                        else if (product.Stock == 0)
+                                        {
+                                            <span class="stock-badge badge" style="background:#f8d7da; color:#721c24;">Out of stock</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="text-center mt-5">
+            <a href="/Product" class="btn btn-primary-brand btn-lg px-5">
+                <i class="bi bi-grid me-2"></i>View All Products
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- VALUE PROPS -->
+<section style="background:var(--brand-charcoal); color:white; padding:3.5rem 0;">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <i class="bi bi-truck fs-2 mb-3" style="color:var(--brand-gold);"></i>
+                <h6 style="font-family:'Playfair Display',serif">Free Shipping</h6>
+                <p style="font-size:0.82rem; color:rgba(255,255,255,0.5); margin:0">On all orders over $50</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <i class="bi bi-arrow-repeat fs-2 mb-3" style="color:var(--brand-gold);"></i>
+                <h6 style="font-family:'Playfair Display',serif">Easy Returns</h6>
+                <p style="font-size:0.82rem; color:rgba(255,255,255,0.5); margin:0">30-day return policy</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <i class="bi bi-shield-check fs-2 mb-3" style="color:var(--brand-gold);"></i>
+                <h6 style="font-family:'Playfair Display',serif">Secure Checkout</h6>
+                <p style="font-size:0.82rem; color:rgba(255,255,255,0.5); margin:0">SSL encrypted payments</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <i class="bi bi-headset fs-2 mb-3" style="color:var(--brand-gold);"></i>
+                <h6 style="font-family:'Playfair Display',serif">24/7 Support</h6>
+                <p style="font-size:0.82rem; color:rgba(255,255,255,0.5); margin:0">We're always here to help</p>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,192 @@
+@model CartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-bag me-3"></i>Shopping Cart</h1>
+        <p style="color:rgba(255,255,255,0.55); margin:0; font-size:0.92rem">@Model.CartItems.Count() item(s)</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    @if (!Model.CartItems.Any())
+    {
+        <div class="text-center py-5">
+            <div style="width:100px; height:100px; background:var(--brand-light); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem;">
+                <i class="bi bi-bag" style="font-size:2.5rem; color:var(--brand-muted);"></i>
+            </div>
+            <h3 class="brand-font">Your cart is empty</h3>
+            <p class="text-muted mb-4">Looks like you haven't added anything yet.</p>
+            <a href="/Product" class="btn btn-gold btn-lg px-5">
+                <i class="bi bi-grid me-2"></i>Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4 align-items-start">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div class="form-card p-0 overflow-hidden">
+                    <div class="p-3 border-bottom" style="background:var(--brand-light); border-color:var(--brand-border) !important">
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                <span style="font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--brand-muted);">Product</span>
+                            </div>
+                            <div class="col-2 text-center d-none d-md-block">
+                                <span style="font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--brand-muted);">Price</span>
+                            </div>
+                            <div class="col-2 text-center d-none d-md-block">
+                                <span style="font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--brand-muted);">Qty</span>
+                            </div>
+                            <div class="col-2 text-end d-none d-md-block">
+                                <span style="font-size:0.78rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--brand-muted);">Total</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @foreach (var item in Model.CartItems)
+                    {
+                        <div class="p-3 border-bottom" style="border-color:var(--brand-border) !important">
+                            <div class="row align-items-center g-3">
+                                <!-- Product Info -->
+                                <div class="col-12 col-md-6">
+                                    <div class="d-flex gap-3 align-items-center">
+                                        <div style="width:70px; height:70px; border-radius:8px; overflow:hidden; border:1px solid var(--brand-border); flex-shrink:0; background:var(--brand-light)">
+                                            @if (!string.IsNullOrEmpty(item.Product.ImageUrl))
+                                            {
+                                                <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
+                                                     style="width:100%; height:100%; object-fit:cover;" />
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex align-items-center justify-content-center h-100">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div>
+                                            <a href="/Product/Details/@item.Product.Id" class="text-decoration-none"
+                                               style="font-family:'Playfair Display',serif; font-weight:500; color:var(--brand-dark); font-size:0.95rem;">
+                                                @item.Product.Name
+                                            </a>
+                                            <div style="font-size:0.78rem; color:var(--brand-muted);">@item.Product.Category?.Name</div>
+                                            <div class="d-md-none mt-1" style="font-weight:700; font-size:0.95rem;">$@item.Product.Price.ToString("N2")</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="col-2 text-center d-none d-md-block">
+                                    <span style="font-weight:600;">$@item.Product.Price.ToString("N2")</span>
+                                </div>
+
+                                <!-- Quantity -->
+                                <div class="col-7 col-md-2 text-center">
+                                    <form action="/Cart/UpdateQuantity" method="post" class="d-flex align-items-center justify-content-center gap-1">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="cartItemId" value="@item.Id" />
+                                        <button type="button" class="btn btn-sm"
+                                                style="width:28px; height:28px; padding:0; background:var(--brand-light); border:1.5px solid var(--brand-border); border-radius:6px;"
+                                                onclick="adjustQty(this, -1)">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" name="quantity" value="@item.Quantity" min="1" max="@item.Product.Stock"
+                                               class="form-control text-center" id="qty-@item.Id"
+                                               style="width:55px; height:28px; padding:0; font-size:0.88rem; font-weight:600;"
+                                               onchange="this.form.submit()" />
+                                        <button type="button" class="btn btn-sm"
+                                                style="width:28px; height:28px; padding:0; background:var(--brand-light); border:1.5px solid var(--brand-border); border-radius:6px;"
+                                                onclick="adjustQty(this, 1)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Subtotal + Remove -->
+                                <div class="col-5 col-md-2 text-end">
+                                    <div style="font-weight:700; font-size:1rem;">
+                                        $@((item.Quantity * item.Product.Price).ToString("N2"))
+                                    </div>
+                                    <form action="/Cart/Remove" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="cartItemId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm mt-1 p-0"
+                                                style="color:var(--brand-muted); font-size:0.8rem; text-decoration:underline; background:none; border:none;"
+                                                onclick="return confirm('Remove this item?')">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="p-3 d-flex gap-2 justify-content-between flex-wrap">
+                        <a href="/Product" class="btn btn-outline-brand">
+                            <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="form-card">
+                    <h5 class="brand-font mb-4" style="font-size:1.3rem;">Order Summary</h5>
+
+                    <div class="d-flex justify-content-between mb-2" style="font-size:0.92rem;">
+                        <span class="text-muted">Subtotal (@Model.CartItems.Sum(ci => ci.Quantity) items)</span>
+                        <span class="fw-semibold">$@Model.Total.ToString("N2")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2" style="font-size:0.92rem;">
+                        <span class="text-muted">Shipping</span>
+                        <span class="fw-semibold text-success">@(Model.Total >= 50 ? "Free" : "$9.99")</span>
+                    </div>
+                    @if (Model.Total < 50)
+                    {
+                        <div class="alert mt-2" style="background:var(--brand-light); border:1px solid var(--brand-border); border-radius:8px; font-size:0.82rem; color:var(--brand-muted);">
+                            <i class="bi bi-truck me-1"></i>Add $@((50 - Model.Total).ToString("N2")) more for free shipping!
+                        </div>
+                    }
+
+                    <hr style="border-color:var(--brand-border);" />
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <span style="font-weight:700; font-size:1rem;">Total</span>
+                        <span style="font-weight:700; font-size:1.3rem;">
+                            $@((Model.Total + (Model.Total >= 50 ? 0 : 9.99m)).ToString("N2"))
+                        </span>
+                    </div>
+
+                    <a href="/Order/Checkout" class="btn btn-gold w-100 btn-lg">
+                        <i class="bi bi-lock me-2"></i>Proceed to Checkout
+                    </a>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check me-1"></i>Secure SSL encrypted checkout
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+function adjustQty(btn, delta) {
+    const row = btn.closest('form');
+    const input = row.querySelector('input[name="quantity"]');
+    const max = parseInt(input.max) || 99;
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    if (val > max) val = max;
+    input.value = val;
+    row.submit();
+}
+</script>
+}

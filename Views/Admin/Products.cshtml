@@ -1,0 +1,118 @@
+@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Manage Products";
+}
+
+<div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1><i class="bi bi-box-seam me-3"></i>Products</h1>
+            <p style="color:rgba(255,255,255,0.55); margin:0; font-size:0.92rem">@Model.Count() total products</p>
+        </div>
+        <a href="/Admin/CreateProduct" class="btn btn-gold">
+            <i class="bi bi-plus-lg me-2"></i>Add Product
+        </a>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="mb-3">
+        <a href="/Admin" class="text-decoration-none" style="color:var(--brand-gold); font-size:0.88rem;">
+            <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <div class="form-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-brand mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:60px;">Image</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th style="width:160px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                No products found. <a href="/Admin/CreateProduct" style="color:var(--brand-gold);">Add the first one.</a>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var product in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div style="width:44px; height:44px; border-radius:6px; overflow:hidden; border:1px solid var(--brand-border); background:var(--brand-light);">
+                                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                        {
+                                            <img src="@product.ImageUrl" alt="" style="width:100%; height:100%; object-fit:cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex align-items-center justify-content-center h-100">
+                                                <i class="bi bi-image text-muted" style="font-size:1rem;"></i>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="/Product/Details/@product.Id" target="_blank"
+                                       class="text-decoration-none" style="font-weight:500; color:var(--brand-dark);">
+                                        @product.Name
+                                    </a>
+                                </td>
+                                <td style="font-size:0.88rem; color:var(--brand-muted);">@product.Category?.Name</td>
+                                <td><strong>$@product.Price.ToString("N2")</strong></td>
+                                <td>
+                                    @if (product.Stock <= 5)
+                                    {
+                                        <span style="color:#e65100; font-weight:700;">@product.Stock</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@product.Stock</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (product.IsActive)
+                                    {
+                                        <span class="badge" style="background:#d4edda; color:#155724; border-radius:20px; padding:4px 10px; font-size:0.75rem;">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge" style="background:#f8d7da; color:#721c24; border-radius:20px; padding:4px 10px; font-size:0.75rem;">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="/Admin/EditProduct/@product.Id" class="btn btn-sm btn-outline-brand" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="/Admin/DeleteProduct/@product.Id" method="post" class="d-inline"
+                                              onsubmit="return confirm('Remove \'@product.Name\' from the store?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm" title="Remove"
+                                                    style="background:#fff5f5; border:1.5px solid #f5c6cb; color:#721c24;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

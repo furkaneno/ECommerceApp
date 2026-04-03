@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Lumière Shop</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --brand-dark: #0d0d0d;
+            --brand-charcoal: #1a1a2e;
+            --brand-gold: #c9a84c;
+            --brand-gold-light: #e8c97e;
+            --brand-cream: #faf8f3;
+            --brand-light: #f5f3ee;
+            --brand-muted: #888888;
+            --brand-border: #e8e4dc;
+            --card-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            --card-shadow-hover: 0 8px 40px rgba(0,0,0,0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--brand-cream);
+            color: var(--brand-dark);
+            font-size: 15px;
+            line-height: 1.65;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* ── NAVBAR ── */
+        .navbar-main {
+            background: var(--brand-dark);
+            padding: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--brand-gold) !important;
+            letter-spacing: 0.02em;
+            text-decoration: none;
+        }
+
+        .navbar-main .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 400;
+            font-size: 0.88rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 1.4rem 1rem !important;
+            transition: color 0.2s;
+        }
+
+        .navbar-main .nav-link:hover {
+            color: var(--brand-gold) !important;
+        }
+
+        .navbar-main .nav-link.active {
+            color: var(--brand-gold) !important;
+        }
+
+        .search-form .form-control {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white;
+            border-radius: 6px 0 0 6px;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .search-form .form-control::placeholder { color: rgba(255,255,255,0.35); }
+        .search-form .form-control:focus {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--brand-gold);
+            box-shadow: none;
+            color: white;
+        }
+
+        .search-form .btn {
+            background: var(--brand-gold);
+            border: none;
+            color: var(--brand-dark);
+            border-radius: 0 6px 6px 0;
+            padding: 0.5rem 0.9rem;
+            font-size: 0.85rem;
+        }
+
+        .cart-badge {
+            background: var(--brand-gold);
+            color: var(--brand-dark);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 20px;
+            position: relative;
+            top: -8px;
+            left: -4px;
+        }
+
+        .btn-navbar-cta {
+            background: var(--brand-gold);
+            color: var(--brand-dark) !important;
+            border: none;
+            border-radius: 6px;
+            padding: 0.45rem 1.1rem !important;
+            font-weight: 600;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: background 0.2s;
+        }
+
+        .btn-navbar-cta:hover { background: var(--brand-gold-light) !important; }
+
+        /* ── ALERTS ── */
+        .alert-floating {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 380px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            animation: slideInRight 0.3s ease;
+        }
+
+        @@keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ── BUTTONS ── */
+        .btn-primary-brand {
+            background: var(--brand-dark);
+            color: white;
+            border: 2px solid var(--brand-dark);
+            border-radius: 6px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            transition: all 0.2s;
+            padding: 0.6rem 1.6rem;
+        }
+
+        .btn-primary-brand:hover {
+            background: var(--brand-charcoal);
+            color: white;
+            border-color: var(--brand-charcoal);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-gold {
+            background: var(--brand-gold);
+            color: var(--brand-dark);
+            border: 2px solid var(--brand-gold);
+            border-radius: 6px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            transition: all 0.2s;
+            padding: 0.6rem 1.6rem;
+        }
+
+        .btn-gold:hover {
+            background: var(--brand-gold-light);
+            border-color: var(--brand-gold-light);
+            color: var(--brand-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(201,168,76,0.3);
+        }
+
+        .btn-outline-brand {
+            background: transparent;
+            color: var(--brand-dark);
+            border: 2px solid var(--brand-dark);
+            border-radius: 6px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            transition: all 0.2s;
+            padding: 0.6rem 1.6rem;
+        }
+
+        .btn-outline-brand:hover {
+            background: var(--brand-dark);
+            color: white;
+        }
+
+        /* ── PRODUCT CARDS ── */
+        .product-card {
+            background: white;
+            border: 1px solid var(--brand-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+        }
+
+        .product-card:hover {
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-3px);
+        }
+
+        .product-card-img-wrap {
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: var(--brand-light);
+        }
+
+        .product-card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-card-img-wrap img {
+            transform: scale(1.05);
+        }
+
+        .product-card-body {
+            padding: 1.2rem;
+        }
+
+        .product-category-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--brand-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--brand-dark);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .product-price {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+        }
+
+        .stock-badge {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        /* ── FORMS ── */
+        .form-card {
+            background: white;
+            border: 1px solid var(--brand-border);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 0.88rem;
+            letter-spacing: 0.03em;
+            color: var(--brand-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control, .form-select {
+            border: 1.5px solid var(--brand-border);
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            font-size: 0.92rem;
+            background: var(--brand-cream);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--brand-gold);
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+            background: white;
+        }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            background: var(--brand-dark);
+            color: white;
+            padding: 3rem 0 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        /* ── FOOTER ── */
+        .footer-main {
+            background: var(--brand-dark);
+            color: rgba(255,255,255,0.6);
+            padding: 3rem 0 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .footer-main h6 {
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-main a {
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.88rem;
+            display: block;
+            margin-bottom: 0.4rem;
+            transition: color 0.2s;
+        }
+
+        .footer-main a:hover { color: var(--brand-gold); }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--brand-gold);
+        }
+
+        .footer-divider {
+            border-color: rgba(255,255,255,0.08);
+            margin: 2rem 0 1rem;
+        }
+
+        /* ── TABLE ── */
+        .table-brand th {
+            background: var(--brand-light);
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--brand-muted);
+            border: none;
+            padding: 1rem;
+        }
+
+        .table-brand td {
+            vertical-align: middle;
+            padding: 0.9rem 1rem;
+            border-color: var(--brand-border);
+        }
+
+        /* ── HERO SECTION ── */
+        .hero-section {
+            background: linear-gradient(135deg, var(--brand-charcoal) 0%, #16213e 100%);
+            color: white;
+            padding: 5rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 60%;
+            height: 200%;
+            background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+        }
+
+        .hero-eyebrow {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--brand-gold);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 5vw, 3.8rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-sub {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.65);
+            max-width: 500px;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        /* ── SECTION HEADINGS ── */
+        .section-eyebrow {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--brand-gold);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            font-weight: 500;
+            color: var(--brand-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        /* ── MISC ── */
+        .divider-gold {
+            width: 50px;
+            height: 3px;
+            background: var(--brand-gold);
+            border: none;
+            margin: 1rem 0 2rem;
+        }
+
+        .badge-status-pending { background: #fff3cd; color: #856404; }
+        .badge-status-processing { background: #cfe2ff; color: #084298; }
+        .badge-status-shipped { background: #d1ecf1; color: #0c5460; }
+        .badge-status-delivered { background: #d4edda; color: #155724; }
+        .badge-status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .nav-pills .nav-link.active {
+            background: var(--brand-dark);
+            color: white;
+        }
+
+        .nav-pills .nav-link {
+            color: var(--brand-dark);
+            border: 1.5px solid var(--brand-border);
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-main navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand-text me-4" href="/">Lumière</a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" style="color:white">
+            <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/Product">Shop</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Categories</a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="/Product?categoryId=1">Electronics</a></li>
+                        <li><a class="dropdown-item" href="/Product?categoryId=2">Clothing</a></li>
+                        <li><a class="dropdown-item" href="/Product?categoryId=3">Books</a></li>
+                        <li><a class="dropdown-item" href="/Product?categoryId=4">Home & Garden</a></li>
+                        <li><a class="dropdown-item" href="/Product?categoryId=5">Sports</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <form class="d-flex search-form me-3" action="/" method="get">
+                <input class="form-control" type="search" name="search" placeholder="Search products..." style="width:200px" />
+                <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+
+            <ul class="navbar-nav align-items-center gap-1">
+                <li class="nav-item">
+                    <a class="nav-link" href="/Cart">
+                        <i class="bi bi-bag fs-5"></i>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                </li>
+
+                @if (Context.Session.GetInt32("UserId") != null)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            @Context.Session.GetString("UserName")?.Split(' ')[0]
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/Order/History"><i class="bi bi-clock-history me-2"></i>My Orders</a></li>
+                            @if (Context.Session.GetInt32("IsAdmin") == 1)
+                            {
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="/Admin"><i class="bi bi-shield-lock me-2"></i>Admin Panel</a></li>
+                            }
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" href="/Account/Logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item"><a class="nav-link btn-navbar-cta ms-2" href="/Account/Login">Sign In</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- FLOATING ALERTS -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible alert-floating" role="alert">
+        <i class="bi bi-check-circle me-2"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible alert-floating" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- MAIN CONTENT -->
+<main>
+    @RenderBody()
+</main>
+
+<!-- FOOTER -->
+<footer class="footer-main">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="footer-brand mb-2">Lumière</div>
+                <p style="font-size:0.88rem; line-height:1.7">
+                    Premium quality products curated for the discerning customer.
+                    Crafted with care, delivered with pride.
+                </p>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6>Shop</h6>
+                <a href="/Product">All Products</a>
+                <a href="/Product?categoryId=1">Electronics</a>
+                <a href="/Product?categoryId=2">Clothing</a>
+                <a href="/Product?categoryId=3">Books</a>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6>Account</h6>
+                <a href="/Account/Login">Sign In</a>
+                <a href="/Account/Register">Register</a>
+                <a href="/Order/History">My Orders</a>
+                <a href="/Cart">Cart</a>
+            </div>
+            <div class="col-lg-4">
+                <h6>Stay Connected</h6>
+                <p style="font-size:0.88rem">Subscribe for exclusive deals and new arrivals.</p>
+                <div class="d-flex gap-2">
+                    <input type="email" class="form-control form-control-sm" placeholder="your@email.com"
+                           style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:white;" />
+                    <button class="btn btn-sm btn-gold px-3">Join</button>
+                </div>
+            </div>
+        </div>
+        <hr class="footer-divider" />
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <p class="mb-0" style="font-size:0.82rem">© @DateTime.Now.Year Lumière Shop. All rights reserved.</p>
+            <div class="d-flex gap-3">
+                <i class="bi bi-facebook fs-5" style="color:rgba(255,255,255,0.3); cursor:pointer;"></i>
+                <i class="bi bi-instagram fs-5" style="color:rgba(255,255,255,0.3); cursor:pointer;"></i>
+                <i class="bi bi-twitter-x fs-5" style="color:rgba(255,255,255,0.3); cursor:pointer;"></i>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto-dismiss alerts
+    setTimeout(() => {
+        document.querySelectorAll('.alert-floating').forEach(el => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+            bsAlert.close();
+        });
+    }, 4500);
+
+    // Update cart count
+    async function updateCartCount() {
+        try {
+            const res = await fetch('/Cart/Count');
+            const count = await res.json();
+            document.getElementById('cartCount').textContent = count;
+        } catch (e) {}
+    }
+    updateCartCount();
+</script>
+@RenderSection("Scripts", required: false)
+</body>
+</html>

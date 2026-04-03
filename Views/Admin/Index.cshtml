@@ -1,0 +1,153 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    int totalProducts = ViewBag.TotalProducts ?? 0;
+    int totalOrders = ViewBag.TotalOrders ?? 0;
+    int totalUsers = ViewBag.TotalUsers ?? 0;
+    decimal totalRevenue = ViewBag.TotalRevenue ?? 0m;
+    var recentOrders = ViewBag.RecentOrders as IEnumerable<ECommerceApp.Models.Order> ?? new List<ECommerceApp.Models.Order>();
+}
+
+<div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1><i class="bi bi-shield-lock me-3"></i>Admin Dashboard</h1>
+            <p style="color:rgba(255,255,255,0.55); margin:0; font-size:0.92rem">Welcome back, Administrator</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/Admin/Products" class="btn btn-gold"><i class="bi bi-box-seam me-2"></i>Products</a>
+            <a href="/Admin/Orders" class="btn btn-outline-light"><i class="bi bi-bag me-2"></i>Orders</a>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="form-card text-center py-4">
+                <div style="width:56px; height:56px; background:linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+                    <i class="bi bi-box-seam fs-4" style="color:#e65100;"></i>
+                </div>
+                <div style="font-size:2.2rem; font-weight:700; font-family:'Playfair Display',serif; line-height:1;">@totalProducts</div>
+                <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--brand-muted); font-weight:700; margin-top:0.3rem;">Products</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="form-card text-center py-4">
+                <div style="width:56px; height:56px; background:linear-gradient(135deg, #e8f5e9, #c8e6c9); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+                    <i class="bi bi-bag-check fs-4" style="color:#1b5e20;"></i>
+                </div>
+                <div style="font-size:2.2rem; font-weight:700; font-family:'Playfair Display',serif; line-height:1;">@totalOrders</div>
+                <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--brand-muted); font-weight:700; margin-top:0.3rem;">Orders</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="form-card text-center py-4">
+                <div style="width:56px; height:56px; background:linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+                    <i class="bi bi-people fs-4" style="color:#0d47a1;"></i>
+                </div>
+                <div style="font-size:2.2rem; font-weight:700; font-family:'Playfair Display',serif; line-height:1;">@totalUsers</div>
+                <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--brand-muted); font-weight:700; margin-top:0.3rem;">Customers</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="form-card text-center py-4">
+                <div style="width:56px; height:56px; background:linear-gradient(135deg, #fce4ec, #f8bbd0); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+                    <i class="bi bi-currency-dollar fs-4" style="color:#880e4f;"></i>
+                </div>
+                <div style="font-size:1.8rem; font-weight:700; font-family:'Playfair Display',serif; line-height:1;">$@totalRevenue.ToString("N0")</div>
+                <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--brand-muted); font-weight:700; margin-top:0.3rem;">Revenue</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <a href="/Admin/CreateProduct" class="text-decoration-none">
+                <div class="form-card text-center py-4 h-100" style="border:2px dashed var(--brand-border); transition:all 0.2s;"
+                     onmouseover="this.style.borderColor='var(--brand-gold)'; this.style.background='var(--brand-light)'"
+                     onmouseout="this.style.borderColor='var(--brand-border)'; this.style.background='white'">
+                    <i class="bi bi-plus-circle fs-2 mb-2" style="color:var(--brand-gold);"></i>
+                    <div style="font-weight:600; font-size:0.95rem;">Add New Product</div>
+                    <div style="font-size:0.82rem; color:var(--brand-muted);">Add a product to the store</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Admin/Products" class="text-decoration-none">
+                <div class="form-card text-center py-4 h-100" style="border:2px dashed var(--brand-border); transition:all 0.2s;"
+                     onmouseover="this.style.borderColor='var(--brand-gold)'; this.style.background='var(--brand-light)'"
+                     onmouseout="this.style.borderColor='var(--brand-border)'; this.style.background='white'">
+                    <i class="bi bi-grid fs-2 mb-2" style="color:var(--brand-gold);"></i>
+                    <div style="font-weight:600; font-size:0.95rem;">Manage Products</div>
+                    <div style="font-size:0.82rem; color:var(--brand-muted);">Edit, delete, and view all</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Admin/Orders" class="text-decoration-none">
+                <div class="form-card text-center py-4 h-100" style="border:2px dashed var(--brand-border); transition:all 0.2s;"
+                     onmouseover="this.style.borderColor='var(--brand-gold)'; this.style.background='var(--brand-light)'"
+                     onmouseout="this.style.borderColor='var(--brand-border)'; this.style.background='white'">
+                    <i class="bi bi-bag-check fs-2 mb-2" style="color:var(--brand-gold);"></i>
+                    <div style="font-weight:600; font-size:0.95rem;">Manage Orders</div>
+                    <div style="font-size:0.82rem; color:var(--brand-muted);">Update order statuses</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Orders Table -->
+    <div class="form-card p-0 overflow-hidden">
+        <div class="p-3 d-flex justify-content-between align-items-center" style="background:var(--brand-light); border-bottom:1px solid var(--brand-border);">
+            <h5 class="brand-font mb-0">Recent Orders</h5>
+            <a href="/Admin/Orders" class="btn btn-sm btn-outline-brand">View All</a>
+        </div>
+
+        @if (!recentOrders.Any())
+        {
+            <div class="text-center p-5 text-muted">
+                <i class="bi bi-inbox fs-2 mb-2 d-block"></i>
+                No orders yet.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-brand mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in recentOrders)
+                        {
+                            var statusClass = order.Status switch {
+                                ECommerceApp.Models.OrderStatus.Pending => "badge-status-pending",
+                                ECommerceApp.Models.OrderStatus.Processing => "badge-status-processing",
+                                ECommerceApp.Models.OrderStatus.Shipped => "badge-status-shipped",
+                                ECommerceApp.Models.OrderStatus.Delivered => "badge-status-delivered",
+                                ECommerceApp.Models.OrderStatus.Cancelled => "badge-status-cancelled",
+                                _ => "badge-status-pending"
+                            };
+                            <tr>
+                                <td><strong>#@order.Id.ToString("D6")</strong></td>
+                                <td>@order.User?.FullName</td>
+                                <td style="font-size:0.88rem; color:var(--brand-muted);">@order.OrderDate.ToString("MMM dd, yyyy")</td>
+                                <td><strong>$@order.TotalAmount.ToString("N2")</strong></td>
+                                <td><span class="badge @statusClass px-2 py-1" style="font-size:0.78rem; border-radius:20px;">@order.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

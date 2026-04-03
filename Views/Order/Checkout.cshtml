@@ -1,0 +1,139 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+    var cartItems = ViewBag.CartItems as IEnumerable<ECommerceApp.Models.CartItem> ?? new List<ECommerceApp.Models.CartItem>();
+    decimal total = ViewBag.Total ?? 0m;
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-lock me-3"></i>Secure Checkout</h1>
+        <p style="color:rgba(255,255,255,0.55); margin:0; font-size:0.92rem">Complete your order below</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-5 align-items-start">
+
+        <!-- Checkout Form -->
+        <div class="col-lg-7">
+            <form asp-action="Checkout" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="form-card">
+                    <h5 class="brand-font mb-4" style="font-size:1.3rem;">
+                        <i class="bi bi-geo-alt me-2" style="color:var(--brand-gold)"></i>Shipping Details
+                    </h5>
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" style="display:none;"></div>
+                    @if (ViewContext.ModelState.ErrorCount > 0)
+                    {
+                        <div class="alert alert-danger rounded-3 mb-4">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Please correct the errors below.
+                        </div>
+                    }
+
+                    <div class="mb-4">
+                        <label asp-for="ShippingAddress" class="form-label">
+                            Shipping Address <span style="color:#dc3545">*</span>
+                        </label>
+                        <textarea asp-for="ShippingAddress" class="form-control" rows="4"
+                                  placeholder="Enter your full shipping address&#10;e.g. 123 Main St, Apt 4B&#10;New York, NY 10001"></textarea>
+                        <span asp-validation-for="ShippingAddress" class="text-danger" style="font-size:0.82rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label">Order Notes <span class="text-muted">(optional)</span></label>
+                        <textarea asp-for="Notes" class="form-control" rows="3"
+                                  placeholder="Special delivery instructions, gift message, etc."></textarea>
+                    </div>
+                </div>
+
+                <!-- Payment Note -->
+                <div class="form-card mt-4" style="background: linear-gradient(135deg, #f0f9f0, #e8f5e9); border-color:#c8e6c9;">
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-credit-card fs-4 mt-1" style="color:#2e7d32;"></i>
+                        <div>
+                            <h6 style="font-weight:700; color:#1b5e20; margin-bottom:0.3rem;">Demo Payment Mode</h6>
+                            <p class="mb-0" style="font-size:0.88rem; color:#2e7d32;">
+                                This is a demo application. No real payment is processed.
+                                Click "Place Order" to complete your test order instantly.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-3 flex-wrap">
+                    <button type="submit" class="btn btn-gold btn-lg px-5 flex-grow-1">
+                        <i class="bi bi-check-circle me-2"></i>Place Order — $@((total + (total >= 50 ? 0 : 9.99m)).ToString("N2"))
+                    </button>
+                    <a href="/Cart" class="btn btn-outline-brand btn-lg">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Cart
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="col-lg-5">
+            <div class="form-card">
+                <h5 class="brand-font mb-4" style="font-size:1.3rem;">Order Summary</h5>
+
+                @foreach (var item in cartItems)
+                {
+                    <div class="d-flex gap-3 align-items-center mb-3 pb-3" style="border-bottom:1px solid var(--brand-border);">
+                        <div style="width:55px; height:55px; border-radius:8px; overflow:hidden; border:1px solid var(--brand-border); flex-shrink:0; background:var(--brand-light);">
+                            @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                            {
+                                <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
+                                     style="width:100%; height:100%; object-fit:cover;" />
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center h-100">
+                                    <i class="bi bi-image text-muted" style="font-size:1.2rem;"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="flex-grow-1">
+                            <div style="font-size:0.88rem; font-weight:500;">@item.Product?.Name</div>
+                            <div style="font-size:0.78rem; color:var(--brand-muted);">Qty: @item.Quantity</div>
+                        </div>
+                        <div style="font-weight:700; font-size:0.92rem; white-space:nowrap;">
+                            $@((item.Quantity * (item.Product?.Price ?? 0)).ToString("N2"))
+                        </div>
+                    </div>
+                }
+
+                <div class="d-flex justify-content-between mt-3" style="font-size:0.9rem;">
+                    <span class="text-muted">Subtotal</span>
+                    <span class="fw-semibold">$@total.ToString("N2")</span>
+                </div>
+                <div class="d-flex justify-content-between mt-2" style="font-size:0.9rem;">
+                    <span class="text-muted">Shipping</span>
+                    <span class="fw-semibold @(total >= 50 ? "text-success" : "")">
+                        @(total >= 50 ? "FREE" : "$9.99")
+                    </span>
+                </div>
+
+                <hr style="border-color:var(--brand-border);" />
+
+                <div class="d-flex justify-content-between">
+                    <span style="font-weight:700; font-size:1rem;">Total</span>
+                    <span style="font-weight:700; font-size:1.4rem;">
+                        $@((total + (total >= 50 ? 0 : 9.99m)).ToString("N2"))
+                    </span>
+                </div>
+
+                <div class="mt-4 p-3 rounded-3 text-center" style="background:var(--brand-light); border:1px solid var(--brand-border);">
+                    <div style="display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap;">
+                        <span style="font-size:0.78rem; color:var(--brand-muted);"><i class="bi bi-shield-check me-1"></i>SSL Secure</span>
+                        <span style="font-size:0.78rem; color:var(--brand-muted);"><i class="bi bi-arrow-repeat me-1"></i>30-Day Returns</span>
+                        <span style="font-size:0.78rem; color:var(--brand-muted);"><i class="bi bi-truck me-1"></i>Fast Delivery</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
